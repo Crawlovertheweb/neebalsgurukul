@@ -1,0 +1,155 @@
+Account (acc_no, balance, type, branch_id)
+Customer (cust_id, cname, caddr)
+Customer_Phone (cust_id, phone)
+Holds (acc_no, cust_id)
+Branch (branch_id, branch_addr)
+
+create database bank;
+use bank;
+create table account(acc_no bigint(4) primary key,balance double, type varchar(255),branch_id bigint(4));
+create table customer(cust_id bigint(4) primary key,cname varchar(255), caddr varchar(255));
+create table customer_phone(cust_id bigint(4) references customer(cust_id) ,phone bigint(10));
+create table holds(acc_no bigint(10) references account(acc_no),cust_id bigint(10) references customer(cust_id));
+create table branch(branch_id bigint(10) primary key,branch_addr varchar(10));
+alter table account add foreign key (branch_id)references branch(branch_id);
+
+ A customer may or may not have phone number.
+ There may be more than one branch at a particular location.
+ Accounts can be of TYPE = S (i.e. saving) or TYPE = C (i.e. checking).
+ Customer may or may not have any accounts.
+
+insert into customer values(1,"abc","Pune");
+insert into customer values(2,"def","Mumbai");
+insert into customer values(3,"ghi","Nashik");
+insert into customer values(4,"jkl","Satara");
+insert into customer values(5,"mno","Sangli");
+
+
+insert into customer_phone values(1,9850777984);
+insert into customer_phone values(1,7822035583);
+insert into customer_phone values(1,9890988603);
+insert into customer_phone values(1,7447570182);
+insert into customer_phone values(1,9322911391);
+
+
+insert into Holds values(1,1);
+insert into Holds values(2,2);
+insert into Holds values(3,3);
+insert into Holds values(4,4);
+insert into Holds values(5,5);
+
+
+insert into Branch values(1,'Khed');
+insert into Branch values(2,'Manchar');
+insert into Branch values(3,'Chakan');
+
+insert into account values(1,5000,'c',1);
+insert into account values(2,5000,'c',1);
+insert into account values(3,5000,'c',2);
+insert into account values(4,5000,'c',3);
+insert into account values(5,4000,'c',3);
+insert into account values(6,15000,'s',1);
+insert into account values(7,55000,'c',2);
+insert into account values(8,75000,'s',2);
+insert into account values(9,35000,'s',1);
+
+
+1. Find the Max, Min, Avg balances of each branch
+
+select max(balance) from account where branch_id=(select branch_id from branch where branch_addr='Khed');
+select max(balance) from account where branch_id=(select branch_id from branch where branch_addr='Manchar');
+select max(balance) from account where branch_id=(select branch_id from branch where branch_addr='Chakan');
+
+select min(balance) from account where branch_id=(select branch_id from branch where branch_addr='Khed');
+select min(balance) from account where branch_id=(select branch_id from branch where branch_addr='Manchar');
+select min(balance) from account where branch_id=(select branch_id from branch where branch_addr='Chakan');
+
+select avg(balance) from account where branch_id=(select branch_id from branch where branch_addr='Khed');
+select avg(balance) from account where branch_id=(select branch_id from branch where branch_addr='Manchar');
+select avg(balance) from account where branch_id=(select branch_id from branch where branch_addr='Chakan');
+
+2. Find total number of accounts in each branch
+
+select count(acc_no)from account where branch_id=(select branch_id from branch where branch_addr='khed');
+select count(acc_no)from account where branch_id=(select branch_id from branch where branch_addr='manchar');
+select count(acc_no)from account where branch_id=(select branch_id from branch where branch_addr='chakan');
+
+3. Find total number of accounts of each type in each branch
+SELECT(SELECT branch_addr FROM branch WHERE branch_id = a.branch_id) AS branch_addr,a.type,(SELECT COUNT(*) FROM account a2 WHERE a2.branch_id = a.branch_id AND a2.type = a.type) AS total_accounts FROM account a;
+
+4. Find branch_no having an average balance >= 2000
+SELECT DISTINCT branch_id FROM account
+WHERE (
+    SELECT AVG(balance)
+    FROM account AS a
+    WHERE a.branch_id = account.branch_id
+) >= 2000;
+
+5. Find customer names having account with Manchar branch.
+SELECT cname FROM customer WHERE cust_id IN (
+    SELECT cust_id FROM holds WHERE acc_no IN (
+        SELECT acc_no FROM account WHERE branch_id = (
+            SELECT branch_id FROM branch WHERE branch_addr = 'Manchar')));
+
+6.  Find customer name having highest balance.
+SELECT cname FROM customer WHERE cust_id = (SELECT cust_id FROM holds WHERE acc_no = ( SELECT acc_no FROM account WHERE balance = (SELECT MAX(balance) FROM account)));
+
+7. Find customer id’s having bal greater than avg bal of the branch to which the account belongs to manchar branch.
+SELECT cust_id FROM holds WHERE acc_no IN (SELECT acc_noFROM account WHERE branch_id = (SELECT branch_id FROM branch WHERE branch_addr = 'Manchar')) AND balance > (SELECT AVG(balance) FROM account WHERE branch_id = (SELECT branch_id FROM branch WHERE branch_addr = 'Manchar'));
+
+8.  Find customer details and their account details i.e. CustId, CustName, AccNo and Bal THEY HOLD
+SELECT c.cust_id, c.cname,(SELECT h.acc_no FROM holds h WHERE h.cust_id = c.cust_id) AS AccNo,(SELECT a.balance FROM account a WHERE a.acc_no = (SELECT h.acc_no FROM holds h WHERE h.cust_id = c.cust_id)) AS Balance FROM customer c;
+
+9.  Find customer names having more than 1 account.
+SELECT cname FROM customer WHERE (SELECT COUNT(*)FROM holds AS h WHERE h.cust_id = customer.cust_id) > 1;
+
+10.  Find customer id’s having avg bal >= 2000.
+SELECT cust_id FROM holds WHERE cust_id IN (SELECT DISTINCT cust_id FROM holds WHERE acc_no IN (SELECT acc_no FROM account WHERE balance >= 2000));
+
+11.  Find accounts belonging to more than 1 customer.
+SELECT DISTINCT acc_no FROM holds h1 WHERE (SELECT COUNT(*)FROM holds h2 WHERE h2.acc_no = h1.acc_no)> 1;
+
+12.  Find customers having only 1 type of account
+SELECT c.cust_id, c.cname FROM customer c WHERE (SELECT COUNT(DISTINCT a.type)FROM account a WHERE a.acc_no IN (SELECT h.acc_no FROM holds h WHERE h.cust_id = c.cust_id)) = 1;
+
+13. Find CustId, CustName, Phone_No, AccNo, Bal, BNO, Bracnh_Addr of accounts. Note if a customer does not have a phone number, still the details of the account should be displayed
+
+
+14 Find customer names having account in branches having same location as the customer address
+SELECT cname FROM customer WHERE c.cust_id IN (SELECT h.cust_id FROM holds h WHERE h.acc_no IN (SELECT a.acc_no FROM account a WHERE a.branch_id IN (SELECT b.branch_id            FROM branch b WHERE b.branch_addr = c.caddr)));
+
+15. Find customer id’s having max balance in each branch.
+SELECT h.cust_id FROM holds h WHERE h.acc_no IN (SELECT a.acc_no FROM account a WHERE a.branch_id = (SELECT b.branch_id FROM branch b WHERE (SELECT MAX(balance) FROM account a2 WHERE a2.branch_id = b.branch_id) = a.balance));
+
+16. Find customer names having highest number of accounts
+
+
+17. Find customer names having a total balance > 50,000
+SELECT cname FROM customer WHERE cust_id IN (SELECT h.cust_id FROM holds h WHERE h.acc_no IN (SELECT a.acc_no FROM account a WHERE a.balance > 50000));
+
+18. Find CustId, CustName, Phone_No, AccNo, Bal, BNO, Branch_Addr of accounts. If a customer does not have a phone number then display a message ‘No Phone no.’ else display the contact detail.
+
+
+19. Find customers having account at every branch
+SELECT cust_id, cname FROM customer c WHERE NOT EXISTS (SELECT branch_id FROM branch WHERE branch_id NOT IN (SELECT a.branch_id FROM account a WHERE a.acc_no IN (SELECT h.acc_no FROM holds h WHERE h.cust_id = c.cust_id)));
+
+20. Find Customers having all types of account
+SELECT c.cust_id, c.cname FROM customer c WHERE (SELECT COUNT(DISTINCT a.type) FROM account a WHERE a.acc_no IN (SELECT h.acc_no FROM holds h WHERE h.cust_id = c.cust_id)) = 2;
+
+21. Find customers having all types of account at the same branch
+SELECT c.cust_id, c.cname FROM customer c WHERE (SELECT COUNT(DISTINCT a.type) FROM account a WHERE a.branch_id = (SELECT a2.branch_id FROM account a2 WHERE a2.acc_no IN ( SELECT h.acc_no FROM holds h WHERE h.cust_id = c.cust_id)LIMIT 1)) = 2;
+
+
+22. Find customer names sharing the same phone number
+
+
+
+23. Find account number having 2nd highest balance in each branch
+SELECT b.branch_id,(SELECT a1.acc_no FROM account a1 WHERE a1.branch_id = b.branch_id ORDER BY a1.balance DESC LIMIT 1 OFFSET 1) AS SecondHighestBalanceAccount FROM branch b;
+
+24. Find customer names who do not have an account
+SELECT cname FROM customer WHERE cust_id NOT IN (SELECT DISTINCT cust_id FROM holds);
+
+25.Find customer names having 2nd highest balance in each branch
+
+
