@@ -1,0 +1,152 @@
+1. Process Management
+ - Investigate and compare different process scheduling algorithms (e.g., FCFS, Round Robin, 
+Priority Scheduling).
+
+Process scheduling is a fundamental aspect of operating systems, and various algorithms have been developed to manage and prioritize processes in a computer system. Let's investigate and compare three common process scheduling algorithms: First-Come, First-Served (FCFS), Round Robin, and Priority Scheduling.
+
+A]First-Come, First-Served (FCFS):
+
+Description: FCFS is one of the simplest scheduling algorithms. It assigns CPU time to processes based on their arrival order. The first process that arrives gets the CPU first, and the others wait in a queue.
+Advantages:
+
+Easy to understand and implement.
+Fairness in terms of order of arrival.
+Disadvantages:
+
+Poor in terms of response time for short processes if long processes are ahead in the queue (known as the "convoy effect").
+Doesn't consider the priority of processes, which can lead to inefficiencies.
+Round Robin:
+
+Description: Round Robin is a preemptive scheduling algorithm. Each process is assigned a fixed time quantum (e.g., 10 milliseconds), and they take turns executing in a circular queue. If a process doesn't complete within its time quantum, it is moved to the back of the queue.
+
+Advantages:
+
+Ensures fairness, as each process gets a chance to execute.
+Suitable for time-sharing systems and environments where responsiveness is important.
+Disadvantages:
+
+Inefficient for processes with varying execution times, as short processes might get delayed behind long ones.
+The choice of time quantum can affect performance. Too short, and there's a high context-switching overhead; too long, and it might not be responsive enough.
+Priority Scheduling:
+
+Description: Priority scheduling assigns a priority value to each process, with higher values indicating higher priority. The process with the highest priority gets the CPU. If multiple processes have the same priority, a scheduling algorithm (such as FCFS) is often used to decide the order.
+
+Advantages:
+
+Efficient for handling critical tasks by assigning them higher priorities.
+Allows for the dynamic adjustment of priorities based on system conditions.
+Disadvantages:
+
+Can suffer from priority inversion, where a low-priority process holds a resource that a high-priority process needs.
+May lead to starvation, where low-priority processes never get CPU time if higher-priority processes are continually arriving.
+Comparison:
+
+Fairness:
+
+FCFS: Fair in terms of order of arrival.
+Round Robin: Fair as each process gets a chance.
+Priority Scheduling: Fair if priorities are well managed.
+Responsiveness:
+
+FCFS: Poor for short processes if long processes are ahead.
+Round Robin: Good for time-sharing systems.
+Priority Scheduling: Depends on priority assignment.
+Efficiency:
+
+FCFS: Simple but not efficient.
+Round Robin: Efficient in time-sharing environments.
+Priority Scheduling: Can be efficient if priorities are managed well.
+
+
+2. Memory Management:
+ - Explore memory allocation techniques (e.g., Paging, Segmentation) and their pros and cons.
+
+
+Memory management is a critical aspect of operating systems, ensuring that processes can access and utilize memory efficiently. Two common memory allocation techniques are Paging and Segmentation. Let's explore these techniques and their respective pros and cons:
+
+Paging:
+
+Description:
+
+Paging divides physical memory and logical memory into fixed-size blocks called pages.
+Logical addresses in a process are mapped to physical addresses through a page table.
+Allows for non-contiguous allocation of memory.
+Pros:
+
+Simplifies Memory Management: Paging simplifies memory allocation by breaking memory into fixed-sized blocks, making it easier to manage and allocate memory efficiently.
+
+No External Fragmentation: Since pages are of uniform size, there is no external fragmentation, which can occur in other memory allocation techniques.
+
+Simplifies Address Translation: The page table simplifies the translation of logical addresses to physical addresses, which helps in quick address resolution.
+
+Protection: Paging allows for memory protection by setting permissions on a per-page basis, enhancing security.
+
+Cons:
+
+Internal Fragmentation: Paging can suffer from internal fragmentation, where some portion of the last page allocated is unused.
+
+Page Table Size: For large address spaces, the page table can become quite large, which can lead to overhead and increased memory usage.
+
+Overhead: Paging introduces some overhead due to the need for page tables, which can impact system performance.
+
+Segmentation:
+
+Description:
+
+Segmentation divides memory into variable-sized segments, each with a specific purpose or data type.
+Each segment is associated with a name and length.
+Provides a more flexible way to manage memory compared to paging.
+Pros:
+
+Flexibility: Segmentation allows for flexible memory allocation as each segment can grow or shrink independently, accommodating different data structures and processes.
+
+Logical Organization: Segmentation reflects the logical organization of a program, making it easier for programmers to understand and manage memory.
+
+No Internal Fragmentation: Since segments are of variable size, there is typically no internal fragmentation.
+
+Sharing: Segmentation enables memory sharing among processes, as segments can be shared among multiple processes.
+
+Cons:
+
+External Fragmentation: Segmentation can suffer from external fragmentation when segments are deallocated and memory becomes fragmented.
+
+Complex Address Translation: Address translation in segmentation can be more complex than in paging, as it requires two-level translation (segment number and offset within the segment).
+
+Difficult Memory Protection: Protecting memory regions can be more challenging in segmentation, as a single segment can contain multiple data structures with different protection requirements.
+
+Comparison:
+
+Simplicity: Paging is generally simpler to implement and manage.
+Fragmentation: Paging eliminates external fragmentation, while segmentation can suffer from it.
+Flexibility: Segmentation offers more flexibility in memory allocation and sharing.
+Address Translation: Paging has simpler address translation, while segmentation can be more complex.
+Overhead: Paging can introduce some overhead due to page tables, while segmentation may have less overhead in terms of managing data structures.
+
+5. Virtualization
+ - Research and explain the concept of virtual memory and its benefits.
+Virtual Memory is a crucial concept in computer systems that provides an abstraction layer between physical memory (RAM) and the storage devices (usually hard drives or SSDs). It allows a computer to use more memory than is physically installed and provides several benefits:
+
+1. Illusion of Infinite Memory:
+
+Virtual memory makes it seem like a computer has virtually unlimited memory. It allows processes to use more memory than is physically available by storing parts of the program's data and code in secondary storage (usually a hard drive).
+2. Memory Isolation:
+
+Virtual memory provides memory isolation between processes. Each process believes it has its own dedicated memory space, which prevents one process from directly accessing or interfering with the memory of another process.
+3. Simplified Memory Management:
+
+Virtual memory simplifies memory management for both the operating system and programmers. Programmers can write code as if the entire memory space is available to them, and the operating system handles the details of loading data into physical memory as needed.
+4. Efficient Use of Physical Memory:
+
+Virtual memory allows for efficient use of physical memory resources. Not all parts of a program need to be loaded into RAM simultaneously. The operating system can swap data between RAM and disk as needed, ensuring that the most important or frequently used data is in RAM while less critical data resides on disk.
+5. Multi-tasking and Overcommitment:
+
+Virtual memory enables multi-tasking by allowing multiple processes to run concurrently, even if the total memory requirements of those processes exceed the physical memory capacity. This is achieved through a technique called overcommitment, where the operating system can intelligently manage and allocate memory resources to processes as needed.
+6. Memory Protection:
+
+Virtual memory provides memory protection mechanisms. Processes cannot access memory locations that they have not been allocated, preventing accidental or malicious access to other processes' memory.
+7. Fault Tolerance:
+
+Virtual memory contributes to system fault tolerance. If a process encounters an error or crashes, the operating system can reclaim and reuse the memory occupied by that process without affecting the stability of other running processes.
+8. Swapping and Paging:
+
+Virtual memory uses techniques like swapping and paging to move data between RAM and secondary storage. Swapping involves moving an entire process in and out of RAM, while paging divides memory into fixed-size blocks (pages) and swaps individual pages in and out as needed, which is more fine-grained and efficient.
