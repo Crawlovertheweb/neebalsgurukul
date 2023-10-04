@@ -1,0 +1,116 @@
+#1) Create the Employees table.
+
+Create table Employees
+(EmployeeID int8 primary key,
+FirstName char(50),
+LastName   char(50),
+Department char(50),
+Salary Numeric(50));
+
+#Insert a new employee into the Employees table
+
+insert into Employees values(1,"Raunak","Singh","IT",5000);
+
+#3) Update an employee's salary.
+
+update Employees set salary = 55000 where EmployeeID = 6;
+
+#Insert multiple employees into the Employees table using a single INSERT statement.
+insert into Employees values(2,"Yash","Doke","Mechanical",30000),
+                            (3,"Rohit","Shirke","Finance",35000),
+                            (4,"Gagan","Singh","COMP",45000),
+                            (5,"Azhar","Sheikh","Civil",5000),
+                            (6,"Sagar","Shinde","Finance",55000);
+ #Delete an employee from the Employees table.  
+ 
+delete from employees where EmployeeID = 2;
+
+#6) Update an employee's department.
+
+Update employees set Department = 'Mechanical' where EmployeeID = 5;
+
+#Insert an employee with an auto-incremented EmployeeID
+
+alter table employees modify column  EmployeeID int auto_increment;
+
+insert into employees(FirstName,LastName,Department,Salary) 
+values("Gautami","Kaushik","HR",35000);
+
+#Delete all employees in the HR department.
+
+Delete from employees where Department = "HR";
+
+#Update an employee's last name.
+
+Update employees  set lastName = "Bhardwaj" where EmployeeID = 5;
+
+/*Insert an employee with a specific EmployeeID that already exists (may cause
+a primary key violation).*/
+
+insert into employees values(1,"Mohan","Yadav","COMP",65000);
+
+# Delete all employees with a salary less than 45000.00.
+
+Delete from employees where salary < 45000;
+
+#Update the department of all employees in Marketing to 'Sales'.
+update employees set Department = 'Sales' where  Department = 'Marketing';
+
+#Delete all employees from the Employees table.
+
+delete from employees;
+
+# 14) Update the salary of all employees in the Finance department by 10%.
+
+update employees set Salary = (Salary * 1.10) 
+where Department = 'Finance' ;
+
+/*15) Insert a new employee if the EmployeeID doesn't exist; otherwise, update the existing
+employee*/
+
+insert into employees values(7,'rahul','pal','Marketing',7000);
+update employees Set EmployeeID  = 1 where FirstName = 'Yash';
+update employees set Department='Finance' where EmployeeID in (3,4,5);
+
+#16) Delete employees with a salary greater than 70000.00.
+
+Delete from employees where Salary >70000; 
+
+/*17) Update the salary of an employee by a specific percentage based on their current
+salary.*/
+ update employees set Salary = Salary * 1.15 where Department = 'Finance';
+
+#18) Insert an employee with a NULL value for the Department.
+insert into Employees values(2,"Yash","Doke",null,30000);
+insert into Employees values(6,"AJ","Shirke",null,39000);
+
+#19) Delete all employees with NULL values in the Department column.
+delete from employees where department is null;
+
+#20) Rename the table Employees
+alter table employees rename employees1;
+
+#21) Add a new column "Email" with a VARCHAR data type.
+alter table employees1
+add column Email Varchar(50) NOT NULL;
+
+#22) Increase the length of the "Department" column to 100 characters.
+ alter table employees1
+ modify column Department varchar(100) ; 
+
+#23) Add a NOT NULL constraint to the "FirstName" column.
+alter table employees1
+modify column FirstName Varchar(50) NOT NULL;
+
+#24) Rename the "Salary" column to "AnnualSalary."
+ Alter table employees1
+ Rename column Salary to AnnualSalary;
+ 
+#25) Drop the "Email" column from the table.
+Alter table employees1
+drop column Email;
+
+
+
+
+
