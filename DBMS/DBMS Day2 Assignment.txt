@@ -1,0 +1,62 @@
+/* 1. Write a query to list the employee names, their team names and their role in the team. Sort the results by decreasing
+order of role ID and in alphabetical order of names. Your result set should look something like this (your result set
+will vary of course, this is just for representation purposes) */
+
+select 
+e.Employeename,
+(select TeamName from Team  where Team_id = e.Team_id) As TeamName,
+(SELECT RoleName FROM Role  WHERE Role_id = e.Role_id) AS RoleName
+from  employee e
+order by 
+e.Employeename asc,
+e.Role_id desc;
+
+#2. Write a query to print out the name of the team, its Leader (s) and the name of Members in that team. Your result
+       
+       create table Team (Team_id int8 primary key,
+						  TeamName varchar(50) not null,
+                           TeamLead varchar(50) not null,
+                           TeamMembers varchar(50) not null);
+                           
+        Insert into Team values
+								(3,'Design Validation','Sherril Leclair','Jennifer Krause'),
+								(4,'Regional Compliance 1','Sherrie Casteel','William Harrington'),
+                                (5,'Regional Compliance 1','Sherrie Casteel','Brittany Higgins'),
+                                (6,'Security 1','Angella Joiner','Vincent Davis'),
+                                (7,'Lawanna Ginn','Michael Escobar','IT 3'),
+                                (8,'Rhea Ledford','Leah Payne','Engineering 2'),
+                                (9,'Rhea Ledford','Carolyn Fisher','Engineering 2'),
+                                (10,'Inge Freitas','Brandon Martinez','Market Research');
+
+select TeamName,TeamLead,TeamMembers from Team;
+
+/*3. Write a query to select the name of an employee and their age in years and months and sort them from youngest to
+the oldest. Your result set should look something like this (your result set will vary of course, this is just for
+representation purposes). [Hint: Look at timestampdiff(), current_date(), month() functions] */
+
+alter table employee
+add column date_of_birth date not null;
+
+select * from employee;
+
+select Employeename,timestampdiff(YEAR,date_of_birth,current_date()) As age from employee
+order by age;
+
+#4. If you solve problem 3, can you modify the query to give the age result in 2 separate columns as shown below?
+
+select Employeename,
+timestampdiff(year,date_of_birth,current_date()) as Years,
+timestampdiff(month,date_of_birth,current_date())%12 as Months
+ from employee;
+ 
+#5. Write a query to find how many employees were born in the same year. 
+
+select extract(year from(date_of_birth)) As Birth_Year,count(date_of_birth) As people_born
+ from employee
+ group by date_of_birth;
+ 
+ #6. Write a query to print the name of the employees and their gross salary
+ 
+select concat_ws(' ',FirstName,LastName) As EmployeeName,Salary from employees;
+
+#7 . Write a query to find the number of Sr. Members and Members per team.
