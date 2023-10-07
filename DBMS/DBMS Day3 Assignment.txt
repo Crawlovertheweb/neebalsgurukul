@@ -1,0 +1,217 @@
+CREATE TABLE Authors (
+    author_id INT PRIMARY KEY,
+    author_name VARCHAR(255) NOT NULL,
+    birth_year INT
+);
+
+CREATE TABLE Books (
+    book_id INT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    author_id INT,
+    publication_year INT,
+    price DECIMAL(10, 2),
+    FOREIGN KEY (author_id) REFERENCES Authors(author_id)
+);
+
+CREATE TABLE Orders (
+    order_id INT PRIMARY KEY,
+    book_id INT,
+    customer_id INT,
+    order_date DATE,
+    FOREIGN KEY (book_id) REFERENCES Books(book_id)
+);
+
+
+CREATE TABLE Customers (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    birth_date DATE,
+    address VARCHAR(255)
+);
+
+
+INSERT INTO Authors (author_id, author_name, birth_year)
+VALUES
+    (1, 'Jane Doe', 1975),
+    (2, 'John Smith', 1985),
+    (3, 'Alice Johnson', 1960),
+    (4, 'David Williams', 1992),
+    (5, 'Emily Davis', 1978);
+    
+INSERT INTO Books (book_id, title, author_id, publication_year, price)
+VALUES
+    (108, 'Jakarta', 1, 2020, 20.00),
+    (109, 'Agashta', 1, 2008, 14.95),
+    (110, 'Fear', 2, 2015, 16.50);
+    
+INSERT INTO Orders (order_id, book_id, customer_id, order_date)
+VALUES
+    (201, 101, 1, '2023-05-15'),
+    (202, 103, 2, '2023-06-02'),
+    (203, 105, 3, '2023-07-10'),
+    (204, 102, 4, '2023-05-28'),
+    (205, 104, 5, '2023-04-20'),
+    (206, 101, 2, '2023-07-15'),
+    (207, 106, 3, '2023-06-30'),
+    (208, 107, 1, '2023-07-05');
+    
+
+INSERT INTO Customers (customer_id, customer_name, email, birth_date, address)
+VALUES
+    (1, 'John Doe', 'john@example.com', '1980-03-15', '123 Main St'),
+    (2, 'Jane Smith', 'jane@example.com', '1992-08-21', '456 Elm St'),
+    (3, 'Alice Johnson', 'alice@example.com', '1985-11-10', '789 Oak Ave'),
+    (4, 'David Williams', 'david@example.com', '1977-06-05', '101 Pine Rd'),
+    (5, 'Emily Davis', 'emily@example.com', '1998-02-18', '222 Cedar Ln');
+   
+    
+  #  1. Retrieve a list of all books with their titles and corresponding author names.
+  
+     select a.book_id, a.title ,b.author_name 
+	 from books a
+     join authors b
+     on a.author_id = b.author_id;
+     
+   # 2. List all orders with the book title, customer name, and order date. 
+        
+	 select a.order_id,b.title,c.customer_name,a.order_date
+	 from orders a
+     join Books b
+     on a.book_id = b.book_id
+     join Customers c
+     on a.customer_id = c.customer_id;
+     
+   #  3. Find the total price of all orders, including book prices, for a specific customer (e.g., customer_id =1
+   
+      select sum(b.price) AS price,a.customer_id
+	 from orders a
+     join Books b
+     on a.book_id = b.book_id
+     WHERE a.customer_id = 1;
+     
+ #  4. Display the author names who have books published before the year 2000.
+    select author_name 
+    from authors a
+    join books b
+    on a.author_id = b.author_id
+    where b.publication_year<2000;
+
+  # 5. List the titles of books and their authors where the author's birth year is later than 1970.  
+    select title ,author_name
+    from books b
+    join authors a
+    on b.author_id = a.author_id
+    where a.birth_year>1970;
+    
+
+   # **Subqueries:**
+ #  6. Find the book titles and prices of books written by authors born before 1980.
+ select distinct
+ birth_year
+ from (
+ select b.birth_year,a.title,a.price from books a
+join authors b
+     on b.author_id = a.author_id
+ )As bookstab 
+ where bookstab.birth_year <1980;
+ 
+ #7. Retrieve the names of authors who have written more than 3 books.
+ SELECT author_name
+FROM authors
+WHERE author_id IN (
+  SELECT author_id
+  FROM books
+  GROUP BY author_id
+  HAVING COUNT(author_id) > 3
+);
+
+#8. List the book titles and authors where the book price is higher than the average book price.
+SELECT b.title, a.author_name
+FROM books b
+INNER JOIN authors a ON b.author_id = a.author_id
+WHERE b.price > (SELECT AVG(price) FROM books);
+
+#9. Find the authors with the highest and lowest average book prices for their books.
+
+
+#10. List the customers who have placed orders for books written by a specific author (e.g., author_id 2). 
+ 
+    SELECT DISTINCT c.customer_id, c.customer_name
+FROM Customers c
+INNER JOIN (
+  SELECT o.customer_id, o.book_id
+  FROM Orders o
+  INNER JOIN Books b ON o.book_id = b.book_id
+  WHERE b.author_id = 2 -- Replace 2 with the desired author_id
+) subquery ON c.customer_id = subquery.customer_id;
+
+
+#**Filtering:**
+
+#11. Find all books priced between $10 and $20.
+SELECT title, price
+FROM books
+WHERE price BETWEEN 10.00 AND 20.00;
+
+#12. List the books published in the last 5 years.
+SELECT title, publication_year
+FROM books
+WHERE publication_year >= YEAR(CURDATE()) - 5;
+
+#13. Retrieve the orders placed in the month of June.
+SELECT *
+FROM orders
+WHERE MONTH(order_date) = 6;
+
+#14. Find books by a specific author (e.g., author_id = 3) with a price less than $15.
+SELECT title, price
+FROM books
+WHERE author_id = 3 AND price < 15.00;
+
+#15. List orders placed by a specific customer (e.g., customer_id = 4) for books published before 2005.
+SELECT o.order_id, b.title, b.publication_year
+FROM orders o
+INNER JOIN books b ON o.book_id = b.book_id
+WHERE o.customer_id = 4 AND b.publication_year < 2005;
+
+#**Combining Joins, Subqueries, and Filtering:**
+
+#16. Display the book titles and authors for books ordered by a specific customer (e.g., customer_id =2).
+select b.title as Title,
+	   a.author_name as Author_Name
+from (select book_id 
+from orders
+where customer_id=2) book_od
+join books b on b.book_id = book_od.book_id
+join authors a on a.author_id = b.author_id;
+#17. List the authors who have written books ordered by a specific customer (e.g., customer_id = 3).
+select
+	   a.author_name as Author_Name
+from (select book_id 
+from orders
+where customer_id=3) book_od
+join books b on b.book_id = book_od.book_id
+join authors a on a.author_id = b.author_id;
+#18. Find the most expensive book(s) written by authors born after 1990.
+select b.title , b.price
+from (select author_id
+from authors
+where birth_year>=1965) authors_born
+join books b on b.author_id = authors_born.author_id
+order by b.price desc
+limit 1;
+#19. Retrieve the total number of orders placed for books published in a specific year (e.g., 2010).
+select o.order_id
+from (
+select b.book_id
+from books b
+where publication_year=2004)book_ordered
+join orders o on o.book_id = book_ordered.book_id
+;
+#20. Display the book titles and authors for books ordered by customers who have ordered books
+#written by authors born before 1975.
+  
+    
+
+
